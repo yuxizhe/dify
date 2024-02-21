@@ -1,6 +1,6 @@
 const translation = {
-  pageTitle: '嗨，近来可好 👋',
-  welcome: '欢迎来到 Dify, 登录以继续',
+  pageTitle: '欢迎来到 雪球AI应用平台 👋',
+  welcome: '登录以继续',
   email: '邮箱',
   emailPlaceholder: '输入邮箱地址',
   password: '密码',

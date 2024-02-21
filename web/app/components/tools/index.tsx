@@ -68,7 +68,7 @@ const Tools: FC<Props> = ({
   })()
 
   const [query, setQuery] = useState('')
-  const [collectionType, setCollectionType] = useState<CollectionType>(collectionTypeOptions[0].value)
+  const [collectionType, setCollectionType] = useState<CollectionType>(collectionTypeOptions[1].value)
 
   const showCollectionList = (() => {
     let typeFilteredList: Collection[] = []
