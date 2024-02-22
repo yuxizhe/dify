@@ -15,7 +15,7 @@ import ConfigCredential from '@/app/components/tools/setting/build-in/config-cre
 import { fetchCustomCollection, removeBuiltInToolCredential, removeCustomCollection, updateBuiltInToolCredential, updateCustomCollection } from '@/service/tools'
 import EditCustomToolModal from '@/app/components/tools/edit-custom-collection-modal'
 import type { AgentTool } from '@/types/app'
-import { MAX_TOOLS_NUM } from '@/config'
+import { MAX_TOOLS_NUM, apiPrefix } from '@/config'
 
 type Props = {
   collection: Collection | null
@@ -92,7 +92,7 @@ const ToolList: FC<Props> = ({
       >
         <div className='w-6 h-6 bg-center bg-contain rounded-md'
           style={{
-            backgroundImage: `url(${collection.icon})`,
+            backgroundImage: `url(${apiPrefix.replace('/console/api', '')}${collection.icon})`,
           }}
         ></div>
       </div>

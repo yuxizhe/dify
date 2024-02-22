@@ -12,6 +12,7 @@ import { CheckCircle } from '@/app/components/base/icons/src/vender/solid/genera
 import { DataSet as DataSetIcon } from '@/app/components/base/icons/src/public/thought'
 import type { Emoji } from '@/app/components/tools/types'
 import AppIcon from '@/app/components/base/app-icon'
+import { apiPrefix } from '@/config'
 
 type Props = {
   payload: ToolInfoInThought
@@ -30,7 +31,7 @@ const getIcon = (toolName: string, allToolIcons: Record<string, string | Emoji>)
         <div
           className='w-3 h-3 bg-cover bg-center rounded-[3px] shrink-0'
           style={{
-            backgroundImage: `url(${icon})`,
+            backgroundImage: `url(${apiPrefix.replace('/console/api', '')}url(${icon})`,
           }}
         ></div>
       )

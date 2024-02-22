@@ -18,7 +18,7 @@ import Switch from '@/app/components/base/switch'
 import ConfigContext from '@/context/debug-configuration'
 import type { AgentTool } from '@/types/app'
 import { type Collection, CollectionType } from '@/app/components/tools/types'
-import { MAX_TOOLS_NUM } from '@/config'
+import { MAX_TOOLS_NUM, apiPrefix } from '@/config'
 import { AlertTriangle } from '@/app/components/base/icons/src/vender/solid/alertsAndFeedback'
 import TooltipPlus from '@/app/components/base/tooltip-plus'
 import { DefaultToolIcon } from '@/app/components/base/icons/src/public/other'
@@ -103,7 +103,7 @@ const AgentTools: FC = () => {
                         <div
                           className='w-6 h-6 bg-cover bg-center rounded-md'
                           style={{
-                            backgroundImage: `url(${item.icon})`,
+                            backgroundImage: `url(${apiPrefix.replace('/console/api', '')}url(${item.icon})`,
                           }}
                         ></div>
                       )

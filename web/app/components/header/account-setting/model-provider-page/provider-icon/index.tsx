@@ -1,6 +1,7 @@
 import type { FC } from 'react'
 import type { ModelProvider } from '../declarations'
 import { useLanguage } from '../hooks'
+import { apiPrefix } from '@/config'
 
 type ProviderIconProps = {
   provider: ModelProvider
@@ -16,7 +17,7 @@ const ProviderIcon: FC<ProviderIconProps> = ({
     return (
       <img
         alt='provider-icon'
-        src={`${provider.icon_large[language]}?_token=${localStorage.getItem('console_token')}`}
+        src={`${apiPrefix.replace('/console/api', '')}${provider.icon_large[language]}?_token=${localStorage.getItem('console_token')}`}
         className={`w-auto h-6 ${className}`}
       />
     )

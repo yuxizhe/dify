@@ -6,6 +6,7 @@ import cn from 'classnames'
 import AppIcon from '../../base/app-icon'
 import type { Collection } from '@/app/components/tools/types'
 import I18n from '@/context/i18n'
+import { apiPrefix } from '@/config'
 import { getModelRuntimeSupported } from '@/utils/language'
 
 type Props = {
@@ -31,7 +32,7 @@ const Item: FC<Props> = ({
           <div
             className='w-6 h-6 bg-cover bg-center rounded-md'
             style={{
-              backgroundImage: `url(${payload.icon})`,
+              backgroundImage: `url(${apiPrefix.replace('/console/api', '')}${payload.icon})`,
             }}
           ></div>
         )
