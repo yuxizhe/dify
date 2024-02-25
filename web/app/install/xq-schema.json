@@ -1,0 +1,62 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "雪球基金查询",
+    "description": "查询基金信息",
+    "version": "v1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://chat.dappwind.com:3002/djapi"
+    }
+  ],
+  "paths": {
+    "/fund/{codeId}": {
+      "get": {
+        "description": "当给出明确的基金代码时，可用来查询基金信息",
+        "operationId": "fundCodeSearch",
+        "parameters": [
+          {
+            "name": "codeId",
+            "in": "path",
+            "description": "基金代码",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/v2/search": {
+      "get": {
+        "description": "当给出关键字时，根据关键字查询基金",
+        "operationId": "fundSearch",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "query",
+            "description": "基金关键字",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "xq_access_token",
+            "in": "query",
+            "description": "默认token",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "default": "42d33f933c13ca2154d57d2f29b5f5f9d0517727"
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {}
+  }
+}
