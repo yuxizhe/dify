@@ -1,6 +1,5 @@
 import Apps from './Apps'
-import { getLocaleOnServer } from '@/i18n/server'
-import { useTranslation as translate } from '@/i18n/i18next-serverside-config'
+import { getLocaleOnServer, useTranslation as translate } from '@/i18n/server'
 
 const AppList = async () => {
   const locale = getLocaleOnServer()
