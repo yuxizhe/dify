@@ -121,6 +121,11 @@ const NormalForm = () => {
     })
     : null, oauth)
 
+  // 先直接自动登录
+  useEffect(() => {
+    handleEmailPasswordLogin()
+  }, [])
+
   useEffect(() => {
     if (github_error !== undefined)
       dispatch({ type: 'github_login_failed' })
