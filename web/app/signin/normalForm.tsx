@@ -73,7 +73,7 @@ const NormalForm = () => {
   })
 
   const [showPassword, setShowPassword] = useState(false)
-  const [email, setEmail] = useState('yuxz@xueqiu.com')
+  const [email, setEmail] = useState('xueqiu@xueqiu.com')
   const [password, setPassword] = useState('xueqiu123')
 
   const [isLoading, setIsLoading] = useState(false)

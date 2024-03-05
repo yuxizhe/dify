@@ -82,7 +82,7 @@ services:
       S3_SECRET_KEY: 'sk-difyai'
       S3_REGION: 'us-east-1'
       # The type of vector store to use. Supported values are `weaviate`, `qdrant`, `milvus`.
-      VECTOR_STORE: weaviate
+      VECTOR_STORE: milvus
       # The Weaviate endpoint URL. Only available when VECTOR_STORE is `weaviate`.
       WEAVIATE_ENDPOINT: http://weaviate:8080
       # The Weaviate API key.
@@ -95,7 +95,7 @@ services:
       QDRANT_CLIENT_TIMEOUT: 20
       # Milvus configuration Only available when VECTOR_STORE is `milvus`.
       # The milvus host.
-      MILVUS_HOST: 127.0.0.1
+      MILVUS_HOST: 10.208.0.41
       # The milvus host.
       MILVUS_PORT: 19530
       # The milvus username.
@@ -168,7 +168,7 @@ services:
       STORAGE_TYPE: local
       STORAGE_LOCAL_PATH: storage
       # The type of vector store to use. Supported values are `weaviate`, `qdrant`, `milvus`.
-      VECTOR_STORE: weaviate
+      VECTOR_STORE: milvus
       # The Weaviate endpoint URL. Only available when VECTOR_STORE is `weaviate`.
       WEAVIATE_ENDPOINT: http://weaviate:8080
       # The Weaviate API key.
@@ -181,7 +181,7 @@ services:
       QDRANT_CLIENT_TIMEOUT: 20
       # Milvus configuration Only available when VECTOR_STORE is `milvus`.
       # The milvus host.
-      MILVUS_HOST: 127.0.0.1
+      MILVUS_HOST: 10.208.0.41
       # The milvus host.
       MILVUS_PORT: 19530
       # The milvus username.
@@ -283,8 +283,8 @@ services:
       AUTHORIZATION_ADMINLIST_ENABLED: 'true'
       AUTHORIZATION_ADMINLIST_USERS: 'hello@dify.ai'
     # uncomment to expose weaviate port to host
-    # ports:
-    #  - "8080:8080"
+    ports:
+     - "8080:8080"
 
   # Qdrant vector store.
   # uncomment to use qdrant as vector store.
@@ -314,4 +314,4 @@ services:
       - api
       - web
     ports:
-      - "80:80"
+      - "82:80"

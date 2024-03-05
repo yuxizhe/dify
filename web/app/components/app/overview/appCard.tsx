@@ -84,7 +84,7 @@ function AppCard({
     : t('appOverview.overview.apiInfo.title')
   const runningStatus = isApp ? appInfo.enable_site : appInfo.enable_api
   const { app_base_url, access_token } = appInfo.site ?? {}
-  const appUrl = `${'https://chat.dappwind.com'}/${appInfo.mode}/${access_token}`
+  const appUrl = `${'http://chain.dappwind.com'}/${appInfo.mode}/${access_token}`
   const apiUrl = appInfo?.api_base_url
 
   let bgColor = 'bg-primary-50 bg-opacity-40'
