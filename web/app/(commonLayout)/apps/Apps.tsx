@@ -4,8 +4,11 @@ import { useEffect, useRef, useState } from 'react'
 import useSWRInfinite from 'swr/infinite'
 import { useTranslation } from 'react-i18next'
 import { useDebounceFn } from 'ahooks'
+import style from '../list.module.css'
 import AppCard from './AppCard'
 import NewAppCard from './NewAppCard'
+import AppIcon from '@/app/components/base/app-icon'
+
 import type { AppListResponse } from '@/models/app'
 import { fetchAppList } from '@/service/apps'
 import { useAppContext } from '@/context/app-context'
@@ -42,6 +45,8 @@ const Apps = () => {
   const [keywords, setKeywords] = useState('')
   const [searchKeywords, setSearchKeywords] = useState('')
 
+  const [flowiseApps, setFlowiseApps] = useState([])
+
   const { data, isLoading, setSize, mutate } = useSWRInfinite(
     (pageIndex: number, previousPageData: AppListResponse) => getKey(pageIndex, previousPageData, activeTab, searchKeywords),
     fetchAppList,
@@ -55,6 +60,13 @@ const Apps = () => {
     { value: 'completion', text: t('app.types.completion') },
   ]
 
+  const getFlowise = async () => {
+    const response = await fetch('http://chain.snowballfinance.com:3000/api/v1/chatflows')
+    const result = await response.json()
+    console.log(result)
+    setFlowiseApps(result)
+  }
+
   useEffect(() => {
     document.title = `${t('common.menus.apps')} -  雪球AI平台`
     if (localStorage.getItem(NEED_REFRESH_APP_LIST_KEY) === '1') {
@@ -62,6 +74,10 @@ const Apps = () => {
       mutate()
     }
   }, [mutate, t])
+
+  useEffect(() => {
+    getFlowise()
+  }, [])
 
   useEffect(() => {
     let observer: IntersectionObserver | undefined
@@ -130,6 +146,27 @@ const Apps = () => {
         {data?.map(({ data: apps }: any) => apps.map((app: any) => (
           <AppCard key={app.id} app={app} onRefresh={mutate} />
         )))}
+        {flowiseApps?.map((app: any) => (
+          <div key={app.id} onClick={(e) => {
+            window.open(`http://chain.snowballfinance.com:3000/canvas/${app.id}`)
+          }}
+          className={style.listItem}
+          >
+            <div className='m-5 flex items-center'>
+              <AppIcon
+                size="small"
+                icon='⛓️'
+                background='#D1E9FF'
+              />
+              <div className='ml-3'>
+                {app.name}
+              </div>
+            </div>
+            <div className={'w-20 items-center ml-3 mt-10 px-2 h-6 rounded-md border border-gray-100 text-xs text-gray-500 flex'}>
+              <div className='ml-2 text-gray-400'> flow应用</div>
+            </div>
+          </div>
+        ))}
         <CheckModal />
       </nav>
       <div ref={anchorRef} className='h-0'> </div>
