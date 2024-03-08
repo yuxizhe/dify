@@ -63,6 +63,9 @@ const NewAppDialog = ({ show, onSuccess, onClose }: NewAppDialogProps) => {
 
   const isCreatingRef = useRef(false)
   const onCreate: MouseEventHandler = useCallback(async () => {
+    if (newAppMode === 'flow')
+      return window.open('http://chain.snowballfinance.com:3000/canvas')
+
     const name = nameInputRef.current?.value
     if (!name) {
       notify({ type: 'error', message: t('app.newApp.nameNotEmpty') })
@@ -174,6 +177,21 @@ const NewAppDialog = ({ show, onSuccess, onClose }: NewAppDialogProps) => {
                     </div>
                   </div>
                   <div className={`${style.listItemDescription} ${style.noClip}`}>{t('app.newApp.completeAppIntro')}</div>
+                </li>
+                <li
+                  className={classNames(style.listItem, style.selectable, newAppMode === 'flow' && style.selected)}
+                  onClick={() => setNewAppMode('flow')}
+                >
+                  <div className={style.listItemTitle}>
+                    <span className={style.newItemIcon}>
+                      {/* <span className={classNames(style.newItemIconImage, style.newItemIconComplete)} /> */}
+                      <AiText className={classNames('w-5 h-5', newAppMode === 'completion' ? 'text-[#155EEF]' : 'text-gray-700')} />
+                    </span>
+                    <div className={style.listItemHeading}>
+                      <div className={style.listItemHeadingContent}>Flow拖拽编排</div>
+                    </div>
+                  </div>
+                  <div className={`${style.listItemDescription} ${style.noClip}`}>更定制化的可视化拖拽编排能力，基于langchain & flowise</div>
                 </li>
               </ul>
 
