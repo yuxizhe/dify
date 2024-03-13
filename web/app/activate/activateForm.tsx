@@ -109,7 +109,7 @@ const ActivateForm = () => {
           </div>
           <div className="w-full mx-auto mt-6">
             <Button type='primary' className='w-full !fone-medium !text-sm'>
-              <a href="https://chat.dappwind.com">{t('login.explore')}</a>
+              <a href="http://chain.snowballfinance.com">{t('login.explore')}</a>
             </Button>
           </div>
         </div>

@@ -143,7 +143,7 @@ const ConfigPanel = () => {
                 ? null
                 : (
                   <div className={`flex items-center justify-end ${isMobile && 'w-full'}`}>
-                    <a className='flex items-center pr-3 space-x-3' href="https://chat.dappwind.com/" target="_blank">
+                    <a className='flex items-center pr-3 space-x-3' href="http://chain.snowballfinance.com/" target="_blank">
                       <span className='uppercase'>{t('share.chat.powerBy')}</span>
                       {
                         customConfig?.replace_webapp_logo
