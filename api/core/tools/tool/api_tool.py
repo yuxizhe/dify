@@ -1,5 +1,6 @@
 import json
 from json import dumps
+from os import getenv
 from typing import Any, Union
 from urllib.parse import urlencode
 
@@ -8,10 +9,15 @@ import requests
 
 import core.helper.ssrf_proxy as ssrf_proxy
 from core.tools.entities.tool_bundle import ApiBasedToolBundle
-from core.tools.entities.tool_entities import ToolInvokeMessage
-from core.tools.errors import ToolProviderCredentialValidationError
+from core.tools.entities.tool_entities import ToolInvokeMessage, ToolProviderType
+from core.tools.entities.user_entities import UserToolProvider
+from core.tools.errors import ToolInvokeError, ToolParameterValidationError, ToolProviderCredentialValidationError
 from core.tools.tool.tool import Tool
 
+API_TOOL_DEFAULT_TIMEOUT = (
+    int(getenv('API_TOOL_DEFAULT_CONNECT_TIMEOUT', '10')),
+    int(getenv('API_TOOL_DEFAULT_READ_TIMEOUT', '60'))
+)
 
 class ApiTool(Tool):
     api_bundle: ApiBasedToolBundle
@@ -33,7 +39,7 @@ class ApiTool(Tool):
             api_bundle=self.api_bundle.copy() if self.api_bundle else None,
             runtime=Tool.Runtime(**meta)
         )
-
+    
     def validate_credentials(self, credentials: dict[str, Any], parameters: dict[str, Any], format_only: bool = False) -> str:
         """
             validate the credentials for Api tool
@@ -47,6 +53,9 @@ class ApiTool(Tool):
         response = self.do_http_request(self.api_bundle.server_url, self.api_bundle.method, headers, parameters)
         # validate response
         return self.validate_and_parse_response(response)
+
+    def tool_provider_type(self) -> ToolProviderType:
+        return UserToolProvider.ProviderType.API
 
     def assembling_request(self, parameters: dict[str, Any]) -> dict[str, Any]:
         headers = {}
@@ -80,7 +89,7 @@ class ApiTool(Tool):
         needed_parameters = [parameter for parameter in self.api_bundle.parameters if parameter.required]
         for parameter in needed_parameters:
             if parameter.required and parameter.name not in parameters:
-                raise ToolProviderCredentialValidationError(f"Missing required parameter {parameter.name}")
+                raise ToolParameterValidationError(f"Missing required parameter {parameter.name}")
             
             if parameter.default is not None and parameter.name not in parameters:
                 parameters[parameter.name] = parameter.default
@@ -93,7 +102,7 @@ class ApiTool(Tool):
         """
         if isinstance(response, httpx.Response):
             if response.status_code >= 400:
-                raise ToolProviderCredentialValidationError(f"Request failed with status code {response.status_code}")
+                raise ToolInvokeError(f"Request failed with status code {response.status_code} and {response.text}")
             if not response.content:
                 return 'Empty response from the tool, please check your parameters and try again.'
             try:
@@ -106,7 +115,7 @@ class ApiTool(Tool):
                 return response.text
         elif isinstance(response, requests.Response):
             if not response.ok:
-                raise ToolProviderCredentialValidationError(f"Request failed with status code {response.status_code}")
+                raise ToolInvokeError(f"Request failed with status code {response.status_code} and {response.text}")
             if not response.content:
                 return 'Empty response from the tool, please check your parameters and try again.'
             try:
@@ -138,7 +147,7 @@ class ApiTool(Tool):
                 if parameter['name'] in parameters:
                     value = parameters[parameter['name']]
                 elif parameter['required']:
-                    raise ToolProviderCredentialValidationError(f"Missing required parameter {parameter['name']}")
+                    raise ToolParameterValidationError(f"Missing required parameter {parameter['name']}")
                 else:
                     value = (parameter.get('schema', {}) or {}).get('default', '')
                 path_params[parameter['name']] = value
@@ -147,8 +156,8 @@ class ApiTool(Tool):
                 value = ''
                 if parameter['name'] in parameters:
                     value = parameters[parameter['name']]
-                elif parameter['required']:
-                    raise ToolProviderCredentialValidationError(f"Missing required parameter {parameter['name']}")
+                elif parameter.get('required', False):
+                    raise ToolParameterValidationError(f"Missing required parameter {parameter['name']}")
                 else:
                     value = (parameter.get('schema', {}) or {}).get('default', '')
                 params[parameter['name']] = value
@@ -157,8 +166,8 @@ class ApiTool(Tool):
                 value = ''
                 if parameter['name'] in parameters:
                     value = parameters[parameter['name']]
-                elif parameter['required']:
-                    raise ToolProviderCredentialValidationError(f"Missing required parameter {parameter['name']}")
+                elif parameter.get('required', False):
+                    raise ToolParameterValidationError(f"Missing required parameter {parameter['name']}")
                 else:
                     value = (parameter.get('schema', {}) or {}).get('default', '')
                 cookies[parameter['name']] = value
@@ -167,8 +176,8 @@ class ApiTool(Tool):
                 value = ''
                 if parameter['name'] in parameters:
                     value = parameters[parameter['name']]
-                elif parameter['required']:
-                    raise ToolProviderCredentialValidationError(f"Missing required parameter {parameter['name']}")
+                elif parameter.get('required', False):
+                    raise ToolParameterValidationError(f"Missing required parameter {parameter['name']}")
                 else:
                     value = (parameter.get('schema', {}) or {}).get('default', '')
                 headers[parameter['name']] = value
@@ -187,7 +196,7 @@ class ApiTool(Tool):
                             # convert type
                             body[name] = self._convert_body_property_type(property, parameters[name])
                         elif name in required:
-                            raise ToolProviderCredentialValidationError(
+                            raise ToolParameterValidationError(
                                 f"Missing required parameter {name} in operation {self.api_bundle.operation_id}"
                             )
                         elif 'default' in property:
@@ -211,19 +220,19 @@ class ApiTool(Tool):
         
         # do http request
         if method == 'get':
-            response = ssrf_proxy.get(url, params=params, headers=headers, cookies=cookies, timeout=10, follow_redirects=True)
+            response = ssrf_proxy.get(url, params=params, headers=headers, cookies=cookies, timeout=API_TOOL_DEFAULT_TIMEOUT, follow_redirects=True)
         elif method == 'post':
-            response = ssrf_proxy.post(url, params=params, headers=headers, cookies=cookies, data=body, timeout=10, follow_redirects=True)
+            response = ssrf_proxy.post(url, params=params, headers=headers, cookies=cookies, data=body, timeout=API_TOOL_DEFAULT_TIMEOUT, follow_redirects=True)
         elif method == 'put':
-            response = ssrf_proxy.put(url, params=params, headers=headers, cookies=cookies, data=body, timeout=10, follow_redirects=True)
+            response = ssrf_proxy.put(url, params=params, headers=headers, cookies=cookies, data=body, timeout=API_TOOL_DEFAULT_TIMEOUT, follow_redirects=True)
         elif method == 'delete':
-            response = ssrf_proxy.delete(url, params=params, headers=headers, cookies=cookies, data=body, timeout=10, allow_redirects=True)
+            response = ssrf_proxy.delete(url, params=params, headers=headers, cookies=cookies, data=body, timeout=API_TOOL_DEFAULT_TIMEOUT, allow_redirects=True)
         elif method == 'patch':
-            response = ssrf_proxy.patch(url, params=params, headers=headers, cookies=cookies, data=body, timeout=10, follow_redirects=True)
+            response = ssrf_proxy.patch(url, params=params, headers=headers, cookies=cookies, data=body, timeout=API_TOOL_DEFAULT_TIMEOUT, follow_redirects=True)
         elif method == 'head':
-            response = ssrf_proxy.head(url, params=params, headers=headers, cookies=cookies, timeout=10, follow_redirects=True)
+            response = ssrf_proxy.head(url, params=params, headers=headers, cookies=cookies, timeout=API_TOOL_DEFAULT_TIMEOUT, follow_redirects=True)
         elif method == 'options':
-            response = ssrf_proxy.options(url, params=params, headers=headers, cookies=cookies, timeout=10, follow_redirects=True)
+            response = ssrf_proxy.options(url, params=params, headers=headers, cookies=cookies, timeout=API_TOOL_DEFAULT_TIMEOUT, follow_redirects=True)
         else:
             raise ValueError(f'Invalid http method {method}')
         
@@ -282,6 +291,16 @@ class ApiTool(Tool):
                 elif property['type'] == 'null':
                     if value is None:
                         return None
+                elif property['type'] == 'object':
+                    if isinstance(value, str):
+                        try:
+                            return json.loads(value)
+                        except ValueError:
+                            return value
+                    elif isinstance(value, dict):
+                        return value
+                    else:
+                        return value
                 else:
                     raise ValueError(f"Invalid type {property['type']} for property {property}")
             elif 'anyOf' in property and isinstance(property['anyOf'], list):

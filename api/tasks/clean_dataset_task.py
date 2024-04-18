@@ -44,14 +44,18 @@ def clean_dataset_task(dataset_id: str, tenant_id: str, indexing_technique: str,
         documents = db.session.query(Document).filter(Document.dataset_id == dataset_id).all()
         segments = db.session.query(DocumentSegment).filter(DocumentSegment.dataset_id == dataset_id).all()
 
-        index_processor = IndexProcessorFactory(doc_form).init_index_processor()
-        index_processor.clean(dataset, None)
+        if documents is None or len(documents) == 0:
+            logging.info(click.style('No documents found for dataset: {}'.format(dataset_id), fg='green'))
+        else:
+            logging.info(click.style('Cleaning documents for dataset: {}'.format(dataset_id), fg='green'))
+            index_processor = IndexProcessorFactory(doc_form).init_index_processor()
+            index_processor.clean(dataset, None)
 
-        for document in documents:
-            db.session.delete(document)
+            for document in documents:
+                db.session.delete(document)
 
-        for segment in segments:
-            db.session.delete(segment)
+            for segment in segments:
+                db.session.delete(segment)
 
         db.session.query(DatasetProcessRule).filter(DatasetProcessRule.dataset_id == dataset_id).delete()
         db.session.query(DatasetQuery).filter(DatasetQuery.dataset_id == dataset_id).delete()
